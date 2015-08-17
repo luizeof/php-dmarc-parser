@@ -201,12 +201,11 @@ trusted_forwarder:  Message authentication failure was anticipated by
 
 <!-- This element contains DKIM and SPF results, uninterpreted with respect to DMARC. -->
 <xs:complexType name="AuthResultType">
-  <!-- Teon: Do not try to modify order here, it does not work. Some providers (Microsoft's Hotmail) pass certain reports with these two fields in reverse order) -->
   <xs:sequence>
-    <!-- There may be no DKIM signatures, or multiple DKIM signatures. -->
-    <xs:element name="dkim" type="DKIMAuthResultType" minOccurs="0" maxOccurs="unbounded"/>
     <!-- There will always be at least one SPF result. -->
     <xs:element name="spf" type="SPFAuthResultType" minOccurs="1" maxOccurs="unbounded"/>
+    <!-- There may be no DKIM signatures, or multiple DKIM signatures. -->
+    <xs:element name="dkim" type="DKIMAuthResultType" minOccurs="0" maxOccurs="unbounded"/>
   </xs:sequence>
 </xs:complexType>
 

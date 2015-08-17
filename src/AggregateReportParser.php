@@ -112,8 +112,15 @@ class   AggregateReportParser
         $doc = new \DOMDocument();
         $doc->loadXML($xmlContent);
 
-        // Validate it
-        $xsdFilePath = __DIR__ .'/../xsd/rua.xsd.adapted';
+        // Validation #1
+        try {
+            $xsdFilePath = __DIR__ .'/../xsd/rua.xsd.adapted';
+            return $doc->schemaValidate($xsdFilePath, LIBXML_SCHEMA_CREATE);
+        } catch (\Exception $e) {
+        }
+
+        // Validation #2 - Hotmail bug - validate with alternative syntax
+        $xsdFilePath = __DIR__ .'/../xsd/rua.xsd.adapted-hotmail-bug';
         return $doc->schemaValidate($xsdFilePath, LIBXML_SCHEMA_CREATE);
     }
 
