@@ -31,6 +31,30 @@ class   AggregateReportParser
      */
     public static function parseFile ($filePath, $xmlValidationEnabled=true)
     {
+        // Extract content first
+        $fileContent = self::getXmlContentFromFile($filePath);
+
+        // Validate
+        if ($xmlValidationEnabled) {
+            if (!self::validateXmlContent($fileContent)) {
+                throw new Exception("XML validation against rua.xsd failed");
+            }
+        }
+
+        // Parse
+        return self::parseXmlContent($fileContent);
+    }
+
+
+
+    /*
+     * Extract XML content from various file formats
+     *
+     * @param    string          Path to aggregate report file (either .zip, .gz or .xml)
+     * @return   Entity\Report   Parsed report
+     */
+    public static function getXmlContentFromFile ($filePath)
+    {
         // Detect media type
         $finfo         = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
         $fileMediaType = finfo_file($finfo, $filePath);
@@ -51,15 +75,7 @@ class   AggregateReportParser
                 throw new Exception("Unsupported file media type: $fileMediaType");
         }
 
-        // Validate first
-        if ($xmlValidationEnabled) {
-            if (!self::validateXmlContent($fileContent)) {
-                throw new Exception("XML validation against rua.xsd failed");
-            }
-        }
-
-        // Parse it
-        return self::parseXmlContent($fileContent);
+        return $fileContent;
     }
 
 
@@ -112,15 +128,14 @@ class   AggregateReportParser
         $doc = new \DOMDocument();
         $doc->loadXML($xmlContent);
 
-        // Validation #1
-        try {
-            $xsdFilePath = __DIR__ .'/../xsd/rua.xsd.adapted';
+        // Validation exception - Microsoft/Hotmail bug - validate with alternative syntax
+        if (preg_match('#<org_name>Microsoft Corp.</org_name>#', $xmlContent)) {
+            $xsdFilePath = __DIR__ .'/../xsd/rua.xsd.adapted-hotmail-bug';
             return $doc->schemaValidate($xsdFilePath, LIBXML_SCHEMA_CREATE);
-        } catch (\Exception $e) {
         }
 
-        // Validation #2 - Hotmail bug - validate with alternative syntax
-        $xsdFilePath = __DIR__ .'/../xsd/rua.xsd.adapted-hotmail-bug';
+        // Non-buggy organizations
+        $xsdFilePath = __DIR__ .'/../xsd/rua.xsd.adapted';
         return $doc->schemaValidate($xsdFilePath, LIBXML_SCHEMA_CREATE);
     }
 
