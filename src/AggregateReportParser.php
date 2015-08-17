@@ -86,6 +86,15 @@ class   AggregateReportParser
         }
         unset($report->record);
 
+        // Fix empty objects - convert them to empty strings
+        foreach ($report->records as $recordId => $record) {
+            if (isset($record->auth_results->dkim->domain)) {
+                if (is_object($record->auth_results->dkim->domain)) {
+                    $record->auth_results->dkim->domain = '';
+                }
+            }
+        }
+
         return $report;
     }
 
