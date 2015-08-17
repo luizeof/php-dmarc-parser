@@ -1,0 +1,8 @@
+Namespace definition removal:
+- PHP complained with
+    Warning: DOMDocument::schemaValidate(): Element 'feedback': No matching global declaration available for the validation root.
+
+
+
+Additional adjustments:
+- see the source

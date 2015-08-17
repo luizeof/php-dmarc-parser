@@ -26,9 +26,10 @@ class   AggregateReportParser
      * Parse specified file into report object
      *
      * @param    string          Path to aggregate report file (either .zip, .gz or .xml)
+     * @param    bool            Disable XML validation, enabled by default
      * @return   Entity\Report   Parsed report
      */
-    public static function parseFile ($filePath)
+    public static function parseFile ($filePath, $xmlValidationEnabled=true)
     {
         // Detect media type
         $finfo         = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
@@ -50,6 +51,13 @@ class   AggregateReportParser
                 throw new Exception("Unsupported file media type: $fileMediaType");
         }
 
+        // Validate first
+        if ($xmlValidationEnabled) {
+            if (!self::validateXmlContent($fileContent)) {
+                throw new Exception("XML validation against rua.xsd failed");
+            }
+        }
+
         // Parse it
         return self::parseXmlContent($fileContent);
     }
@@ -59,7 +67,9 @@ class   AggregateReportParser
     /*
      * Parse specified file into report object
      *
-     * @param    string          Path to aggregate report file (either .zip, .gz or .xml)
+     * This method does not do validation, which is expected to be done in parseFile() method
+     *
+     * @param    string   XML content to parse
      * @return   Object of objects and arrays
      */
     public static function parseXmlContent ($xmlContent)
@@ -77,6 +87,25 @@ class   AggregateReportParser
         unset($report->record);
 
         return $report;
+    }
+
+
+
+    /*
+     * Validate XML content against DMARC rua.xsd
+     *
+     * @param    string          Content to validate
+     * @return   bool
+     */
+    public static function validateXmlContent ($xmlContent)
+    {
+        // Load XML content
+        $doc = new \DOMDocument();
+        $doc->loadXML($xmlContent);
+
+        // Validate it
+        $xsdFilePath = __DIR__ .'/../xsd/rua.xsd.adapted';
+        return $doc->schemaValidate($xsdFilePath, LIBXML_SCHEMA_CREATE);
     }
 
 
