@@ -1,0 +1,31 @@
+{
+    "name": "teon/dmarc-parser",
+    "type": "library",
+    "description": "PHP library for parsing DMARC reports into raw PHP objects. Do database storage here.",
+    "keywords": ["dmarc", "report", "parser"],
+    "homepage": "https://github.com/teonsystems/php-dmarc-parser",
+    "license": "MIT",
+    "authors": [
+        {
+            "name"      : "Bostjan Skufca",
+            "email"     : "bostjan@teon.si",
+            "homepage"  : "http://teon.si",
+            "role"      : "Developer"
+        }
+    ],
+
+    "require": {
+        "php"           : ">=5.3.0",
+        "ext-fileinfo"  : "*",
+        "ext-json"      : "*",
+        "ext-simplexml" : "*",
+        "ext-zip"       : "*",
+        "ext-zlib"      : "*"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "Teon\\Dmarc\\Parser\\": "src/"
+        }
+    }
+}
